@@ -6,7 +6,8 @@ echo 'Pop Up BeBe'
 #echo -e 'Esto es \e[0;31mrojo\e[0m y esto es \e[1;34mazul resaltado\e[0m'
 
 
-nmap 10.21.2.5-8 | grep 'Nmap scan' | awk '{print $5}' > data.slaves.txt
+#nmap 10.21.2.5-8 | grep 'Nmap scan' | awk '{print $5}' > data.slaves.txt
+nmap 10.21.1.3 | grep 'Nmap scan' | awk '{print $5}' > data.slaves.txt
 
 slaves=($(<data.slaves.txt))
 profil=($(<data.slaves.profile.txt))
@@ -43,6 +44,9 @@ for i in "${!slaves[@]}";do
   else
   git clone -b benchbox https://github.com/2XL/PuppetEssential.git;
   fi;
+
+  PuppetEssential/scripts/installDependencies.sh
+
   echo "byby $host";
   '
 
