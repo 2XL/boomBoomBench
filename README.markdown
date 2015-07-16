@@ -28,9 +28,11 @@ Use cases:
 
 - status =>  retrieve log file from each node from -> ~/PuppetEssential/${hostname}.log ->>> to -> ./status/*
 
-- keepalive => remove disible auto halt script from hosts (only milax: hosts)
+- keepalive => remove disable auto halt script from hosts (only milax: hosts)
 
 - scan => scan_d2xx -> port scan and update :: data.slaves.txt
+
+- destroy => destroy the vagrant project and clean the project base
 
 
 

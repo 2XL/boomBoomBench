@@ -193,6 +193,28 @@ function scan_d2xx(){
 	nmap 10.21.2.1-25 -p 22 | grep 'Nmap scan' | awk '{print $5}' > data.slaves.txt
 }
 
+function scan_d1xx(){
+	nmap 10.21.1.1-25 -p 22 | grep 'Nmap scan' | awk '{print $5}' > data.slaves.txt
+}
+
+
+function clean_clear(){
+
+
+	slaves=($(<data.slaves.txt))
+	for i in "${!slaves[@]}";do
+	 host=${slaves[$i]}
+	  pass=$(more sshpwd)
+	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
+	    echo 'Stop all running virtual machines, project';
+		cd PuppetEssential;
+		vagrant destroy -f;
+		cd;
+		rm -rf PuppetEssential;
+		echo 'OK';
+	  "
+	done
+}
 
 echo "option: $1"
 
@@ -234,7 +256,9 @@ case $1 in
 		scan_d2xx
 
 	;;
-
+	destroy)
+		clean_clear
+	;;
 
 	*)
 	echo "Usage: scan|summon|config|run|status|clean|keepalive"
