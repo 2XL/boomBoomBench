@@ -120,15 +120,24 @@ function run(){
 	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 	     echo 'run some script from scripts.sh  or just run vagrant up '
 	     echo 'check if system is ready';
-
+	     if [ -d PuppetEssential ]; then
 	     cd PuppetEssential/;
+	     git pull;
 	     echo ---------------------------------------------------- ;
 	     ls -l *.box
          vagrant -v;
          VBoxManage --version;
 	     echo ---------------------------------------------------- ;
+	     VBoxManage list runningvms > running
+		 if [ -s running ]; then
+		 vagrant provision;
+		 else
 	     vagrant up;
-	  "  &  to run in parallel with  &
+	     fi
+	     else
+	     echo 'Vagrant Project Not Loaded!!??'
+	     fi
+	  "  & # to run in parallel with  &
 
 	done
 }
@@ -180,8 +189,8 @@ function keepalive(){
 
 }
 
-function scan(){
-	nmap 10.21.2.* | grep 'Nmap scan' | awk '{print $5}' > data.slaves.txt
+function scan_d2xx(){
+	nmap 10.21.2.1-25 -p 22 | grep 'Nmap scan' | awk '{print $5}' > data.slaves.txt
 }
 
 
@@ -221,7 +230,9 @@ case $1 in
 		keepalive
 	;;
 	scan)
-		scan
+
+		scan_d2xx
+
 	;;
 
 
