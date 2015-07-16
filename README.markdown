@@ -20,17 +20,17 @@ Pre Requisites:
 Use cases:
 
 
-summon => connect to each host and have them download PuppetEssential:benchbox (a vagrant project)
+- summon => connect to each host and have them download PuppetEssential:benchbox (a vagrant project)
 
-config => push profile initial from -> 'data.slaves.profile.txt' -> to each host paired with data.slaves.txt row
+- config => push profile initial from -> 'data.slaves.profile.txt' -> to each host paired with data.slaves.txt row
 
-run => check is project is loaded at each host, if true 1st try pull, then check if running if true provision, else up
+- run => check is project is loaded at each host, if true 1st try pull, then check if running if true provision, else up
 
-status =>  retrieve log file from each node from -> ~/PuppetEssential/${hostname}.log ->>> to -> ./status/*
+- status =>  retrieve log file from each node from -> ~/PuppetEssential/${hostname}.log ->>> to -> ./status/*
 
-keepalive => remove disible auto halt script from hosts (only milax: hosts)
+- keepalive => remove disible auto halt script from hosts (only milax: hosts)
 
-scan => scan_d2xx -> port scan and update :: data.slaves.txt
+- scan => scan_d2xx -> port scan and update :: data.slaves.txt
 
 
 
