@@ -45,3 +45,16 @@ uname -r
 
 # reinstalar vbox
 Kill this process -> VBoxHeadless
+
+
+
+# vert secure ftp ... deamon...
+
+port
+20 -> client :data -> server
+21 -> client :rmi -> server
+
+
+To change your ftp root directory, as root, edit /etc/vsftpd/vsftpd.conf and add the following line:
+
+local_root=/opt

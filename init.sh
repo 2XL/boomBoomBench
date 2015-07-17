@@ -18,6 +18,58 @@ fi
 
 
 
+function preconfig(){
+	echo 'Setup vagrant and virtualbox'
+
+	slaves=($(<data.slaves.txt))
+
+	if which sshpass; then
+	    echo 'sshpass/OK'
+	else
+		echo 'Install sshpass'
+		sudo apt-get install sshpass
+	    echo 'sshpass/OK'
+	fi
+
+	for i in "${!slaves[@]}";do
+
+		  printf "%s\t%s\t%s\n" "$i" "$host" "${profil[$i]}"
+		  # push puppet file to remote and make
+		  host=${slaves[$i]}
+		  pass=$(more sshpwd)
+		  # -t for interactive
+
+		  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
+		  echo;
+
+		  if [ -d PuppetEssential ]; then
+		  cd PuppetEssential/;
+		  git pull;
+		  echo ${profil[$i]} > profile
+		  echo ${profil[$i]} > $host.log
+		  cd ~;
+		  else
+	      git clone -b benchbox https://github.com/2XL/PuppetEssential.git;
+		  fi;
+	      sudo PuppetEssential/scripts/installDependencies.sh
+
+
+		  echo byby $host;
+
+
+
+
+
+
+		  "  # -> install vagrant -> otherwise comment it
+
+
+	done
+
+
+
+}
+
 
 # scan de les maquines que hiha disponibles -> data.slaves.txt
 # accedir a les maquines i descarregar el repositori de vagrant
@@ -30,7 +82,6 @@ function summon(){
 	slaves=($(<data.slaves.txt))
 	profil=($(<data.slaves.profile.txt))
 
-
 	if which sshpass; then
 	    echo 'sshpass/OK'
 	else
@@ -38,7 +89,6 @@ function summon(){
 		sudo apt-get install sshpass
 	    echo 'sshpass/OK'
 	fi
-
 
 	echo 'Push resource to each slave'
 	for i in "${!slaves[@]}";do
@@ -60,10 +110,25 @@ function summon(){
 	  else
       git clone -b benchbox https://github.com/2XL/PuppetEssential.git;
 	  fi;
-	  PuppetEssential/scripts/installDependencies.sh
+
+	  if [ -d BenchBox ]; then
+	  cd BenchBox/;
+	  git pull;
+	  cd ~;
+	  else
+      git clone -b chenglong https://github.com/RaulGracia/BenchBox.git;
+	  fi;
+      PuppetEssential/scripts/installDependencies.sh
+
 
 	  echo byby $host;
-	  " # & -> install vagrant -> otherwise comment it
+
+
+
+
+
+
+	  " & # -> install vagrant -> otherwise comment it
 
 	done
 
@@ -128,15 +193,17 @@ function run(){
          vagrant -v;
          VBoxManage --version;
 	     echo ---------------------------------------------------- ;
-	     VBoxManage list runningvms > running
-		 if [ -s running ]; then
-		 vagrant provision;
-		 else
+	     VBoxManage list runningvms | wc -l > running
+		 #if [ -r running ]; then
+		 #vagrant provision;
+		 #else
 	     vagrant up;
-	     fi
+         vagrant provision;
+	     #fi
 	     else
 	     echo 'Vagrant Project Not Loaded!!??'
 	     fi
+      echo byby $host;
 	  "  & # to run in parallel with  &
 
 	done
@@ -155,7 +222,7 @@ function status(){
 	  pass=$(more sshpwd)
 	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 	     echo 'access to here and push log to summoner';
-
+	  echo byby $host;
 	  "
 	pass=$(more sshpwd)
 	sshpass -p "$pass" scp milax@$host:~/PuppetEssential/*.log ./status
@@ -181,6 +248,7 @@ function keepalive(){
 	    echo 'keep file host alive $host!!!';
 		sudo rm /usr/lib/milax-labdeim/autoapaguin.sh;
 		echo 'OK';
+	    echo byby $host;
 	  "
 
 
@@ -198,7 +266,7 @@ function scan_d1xx(){
 }
 
 
-function clean_clear(){
+function stop_clear(){
 
 
 	slaves=($(<data.slaves.txt))
@@ -212,29 +280,42 @@ function clean_clear(){
 		cd;
 		rm -rf PuppetEssential;
 		echo 'OK';
-	  "
+	  echo byby $host;
+	  " & # matar en paralelo...
 	done
 }
 
-echo "option: $1"
+function shutdown(){
 
+	slaves=($(<data.slaves.txt))
+	for i in "${!slaves[@]}";do
+	 host=${slaves[$i]}
+	  pass=$(more sshpwd)
+	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
+		echo 'shutdown!!!'
+		sudo shutdown -h 0
+	  " & # matar en paralelo...
+	done
+}
+echo "option: $1"
 
 case $1 in
 
+	preconfig)
+		# check vagrant and virtual box are installed in the host
+		preconfig
+	;;
 	summon)
 		# summon all the instances and queue install dependencies
 		summon $2
-
 		# todo install
 		# virtual box
 		# vagrant
 		# download precise box
-
 	;;
 	config)
 		# push instances config file form here to each node and load their boxes
 		config $2 # -> data.slaves.profile.txt
-
 	;;
 	run)
 		# vagrant up to all of them
@@ -252,16 +333,17 @@ case $1 in
 		keepalive
 	;;
 	scan)
-
 		scan_d2xx
-
 	;;
 	destroy)
-		clean_clear
+		stop_clear
 	;;
 
+	shutdown)
+		shutdown
+		;;
 	*)
-	echo "Usage: scan|summon|config|run|status|clean|keepalive"
+	echo "Usage: scan|summon|config|run|status|clean|keepalive|stop_clear"
 	;;
 esac
 

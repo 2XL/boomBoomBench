@@ -19,6 +19,7 @@ Pre Requisites:
 
 Use cases:
 
+- preconfig => prepare the host with vagrant & virtualbox
 
 - summon => connect to each host and have them download PuppetEssential:benchbox (a vagrant project)
 
@@ -34,7 +35,7 @@ Use cases:
 
 - destroy => destroy the vagrant project and clean the project base
 
-
+- shutdown => shutdown remote hosts!!!
 
 
 
