@@ -31,12 +31,12 @@ function preconfig(){
 	    echo 'sshpass/OK'
 	fi
 
+    pass=$(more sshpwd)
 	for i in "${!slaves[@]}";do
 
 		  printf "%s\t%s\t%s\n" "$i" "$host" "${profil[$i]}"
 		  # push puppet file to remote and make
 		  host=${slaves[$i]}
-		  pass=$(more sshpwd)
 		  # -t for interactive
 
 		  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
@@ -51,7 +51,7 @@ function preconfig(){
 		  else
 	      git clone -b benchbox https://github.com/2XL/PuppetEssential.git;
 		  fi;
-	      sudo PuppetEssential/scripts/installDependencies.sh
+	      echo $pass  | sudo -S PuppetEssential/scripts/installVagrantVBox.sh
 
 
 		  echo byby $host;
@@ -61,7 +61,7 @@ function preconfig(){
 
 
 
-		  "  # -> install vagrant -> otherwise comment it
+		  "  & # -> install vagrant -> otherwise comment it
 
 
 	done
@@ -89,14 +89,14 @@ function summon(){
 		sudo apt-get install sshpass
 	    echo 'sshpass/OK'
 	fi
-
+    pass=$(more sshpwd)
 	echo 'Push resource to each slave'
 	for i in "${!slaves[@]}";do
 
 	  printf "%s\t%s\t%s\n" "$i" "$host" "${profil[$i]}"
 	  # push puppet file to remote and make
 	  host=${slaves[$i]}
-	  pass=$(more sshpwd)
+
 	  # -t for interactive
 	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 	  echo;
@@ -140,12 +140,13 @@ function config(){
 	echo 'Push resource to each slave'
 	slaves=($(<data.slaves.txt))
 	profil=($(<data.slaves.profile.txt))
+	pass=$(more sshpwd)
 	for i in "${!slaves[@]}";do
 
 	  printf "%s\t%s\t%s\n" "$i" "$host" "${profil[$i]}"
 	  # push puppet file to remote and make
 	  host=${slaves[$i]}
-	  pass=$(more sshpwd)
+
 	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 	    if [ -d PuppetEssential ]; then
 		cd PuppetEssential/;
@@ -176,12 +177,12 @@ function run(){
 
 	slaves=($(<data.slaves.txt))
 	profil=($(<data.slaves.profile.txt))
+	pass=$(more sshpwd)
 	for i in "${!slaves[@]}";do
 
 	  printf "%s\t%s\t%s\n" "$i" "$host" "${profil[$i]}"
 	  # push puppet file to remote and make
 	  host=${slaves[$i]}
-	  pass=$(more sshpwd)
 	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 	     echo 'run some script from scripts.sh  or just run vagrant up '
 	     echo 'check if system is ready';
@@ -227,7 +228,6 @@ function status(){
 	pass=$(more sshpwd)
 	sshpass -p "$pass" scp milax@$host:~/PuppetEssential/*.log ./status
 
-
 	done
 
 }
@@ -246,7 +246,7 @@ function keepalive(){
 	  pass=$(more sshpwd)
 	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 	    echo 'keep file host alive $host!!!';
-		sudo rm /usr/lib/milax-labdeim/autoapaguin.sh;
+		echo $pass  | sudo -S rm /usr/lib/milax-labdeim/autoapaguin.sh;
 		echo 'OK';
 	    echo byby $host;
 	  "
@@ -288,13 +288,13 @@ function stop_clear(){
 function shutdown(){
 
 	slaves=($(<data.slaves.txt))
+	pass=$(more sshpwd)
 	for i in "${!slaves[@]}";do
 	 host=${slaves[$i]}
-	  pass=$(more sshpwd)
-	  sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
+		sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 		echo 'shutdown!!!'
-		sudo shutdown -h 0
-	  " & # matar en paralelo...
+		echo $pass  | sudo -S shutdown -h 0
+	  "  # matar en paralelo...
 	done
 }
 echo "option: $1"

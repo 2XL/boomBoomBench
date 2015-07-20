@@ -19,13 +19,13 @@ Pre Requisites:
 
 Use cases:
 
-- preconfig => prepare the host with vagrant & virtualbox
+- [1]preconfig => prepare the host with vagrant & virtualbox
 
-- summon => connect to each host and have them download PuppetEssential:benchbox (a vagrant project)
+- [2]summon => connect to each host and have them download PuppetEssential:benchbox (a vagrant project) and the boxes!!!
 
-- config => push profile initial from -> 'data.slaves.profile.txt' -> to each host paired with data.slaves.txt row
+- [config] => push profile initial from -> 'data.slaves.profile.txt' -> to each host paired with data.slaves.txt row
 
-- run => check is project is loaded at each host, if true 1st try pull, then check if running if true provision, else up
+- [3]run => check proj is loaded at each host, if true 1st try pull, then check if running if true provision, else up
 
 - status =>  retrieve log file from each node from -> ~/PuppetEssential/${hostname}.log ->>> to -> ./status/*
 
