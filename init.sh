@@ -49,7 +49,7 @@ function preconfig(){
 		  echo ${profil[$i]} > $host.log
 		  cd ~;
 		  else
-	      git clone -b benchbox https://github.com/2XL/PuppetEssential.git;
+	      git clone --recursive -b benchbox https://github.com/2XL/PuppetEssential.git;
 		  fi;
 	      echo $pass  | sudo -S PuppetEssential/scripts/installVagrantVBox.sh
 
@@ -108,7 +108,7 @@ function summon(){
 	  echo ${profil[$i]} > $host.log
 	  cd ~;
 	  else
-      git clone -b benchbox https://github.com/2XL/PuppetEssential.git;
+      git clone --recursive -b benchbox https://github.com/2XL/PuppetEssential.git;
 	  fi;
 
 	  if [ -d BenchBox ]; then
@@ -342,6 +342,15 @@ case $1 in
 	shutdown)
 		shutdown
 		;;
+
+	rmi)
+		# allow random method invocation, at the remote hosts and retrieve them as log. file
+	;;
+
+	credentials)
+		# push the credentials to the running nodes.
+	;;
+
 	*)
 	echo "Usage: scan|summon|config|run|status|clean|keepalive|stop_clear"
 	;;
