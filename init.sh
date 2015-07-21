@@ -137,6 +137,30 @@ function summon(){
 function config(){
 	echo 'push profile type to each client: '
 	# push again profile
+
+
+
+	if [ -s 'data.profile.txt' ]; then
+		result='data.slaves.profile.txt';
+		rm $result;
+		IFS=$'\n' # new lines are the only separators
+		data=($(<data.profile.txt));
+		echo "${data[@]}"
+		for line in "${data[@]}"; do
+			# echo $profile # converteix files en columnes...
+			profile=$(echo $line | cut -f1 -d ' ')
+			replica=$(echo $line | cut -f2 -d ' ')
+
+			# echo $profile
+			# echo $replica
+			for i in $(seq 0 $replica); do
+				echo "$profile-$i" >> $result;
+			done
+
+		done
+	fi;
+
+
 	echo 'Push resource to each slave'
 	slaves=($(<data.slaves.txt))
 	profil=($(<data.slaves.profile.txt))
@@ -250,11 +274,7 @@ function keepalive(){
 		echo 'OK';
 	    echo byby $host;
 	  "
-
-
 	done
-
-
 }
 
 function scan_d2xx(){
@@ -297,6 +317,42 @@ function shutdown(){
 	  "  # matar en paralelo...
 	done
 }
+
+
+function credentials(){
+
+	IFS=$'\n'
+	credentials=($(<data.slaves.credential.$1.txt))
+	slaves=($(<data.slaves.txt))
+	pass=$(more sshpwd)
+	for i in "${!slaves[@]}";do
+	 host=${slaves[$i]}
+		sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
+		echo 'push credentials to home directory'
+		echo ${credentials[$i]}  > $1.key
+		echo 'fin copy'
+
+		echo 'merge credential with config.xml template'
+		echo 'TODO'
+
+
+
+	  "  # matar en paralelo...
+	done
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
 echo "option: $1"
 
 case $1 in
@@ -348,8 +404,11 @@ case $1 in
 	;;
 
 	credentials)
-		# push the credentials to the running nodes.
+		# push the credentials to the running nodes
 	;;
+
+
+
 
 	*)
 	echo "Usage: scan|summon|config|run|status|clean|keepalive|stop_clear"
