@@ -319,21 +319,25 @@ function shutdown(){
 }
 
 
+# cridar aquesta funció despres de haver fet un clone del repositori
 function credentials(){
 
 	IFS=$'\n'
-	credentials=($(<data.slaves.credential.$1.txt))
+	credentials=($(<data.slaves.credential.stacksync.txt))
 	slaves=($(<data.slaves.txt))
 	pass=$(more sshpwd)
 	for i in "${!slaves[@]}";do
 	 host=${slaves[$i]}
 		sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
 		echo 'push credentials to home directory'
-		echo ${credentials[$i]}  > $1.key
-		echo 'fin copy'
-
+		echo ${credentials[$i]}  > PuppetEssential/stacksync.key
+		echo 'fin copy -- credential pushed to sandBox /vagrant/stacksync.key'
 		echo 'merge credential with config.xml template'
-		echo 'TODO'
+		echo 'TODO,'
+		# script en sandbox que configura el config.xml amb aquests credecials
+
+
+
 
 
 
@@ -405,6 +409,7 @@ case $1 in
 
 	credentials)
 		# push the credentials to the running nodes
+		credentials
 	;;
 
 

@@ -27,6 +27,10 @@ Use cases:
 
 - [3]run => check proj is loaded at each host, if true 1st try pull, then check if running if true provision, else up
 
+- [2.1]keygen => TODO
+
+- [2.2]credentials => push generated credentials to nodes sandBox
+
 - status =>  retrieve log file from each node from -> ~/PuppetEssential/${hostname}.log ->>> to -> ./status/*
 
 - keepalive => remove disable auto halt script from hosts (only milax: hosts)
