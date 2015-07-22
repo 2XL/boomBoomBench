@@ -336,8 +336,12 @@ function credentials(){
 		echo 'TODO,'
 		# script en sandbox que configura el config.xml amb aquests credecials
 
-
-
+		echo 'Setup config.xml with stacksync.key with'
+		 # the virtual machines will find the key at their /vagrant directory
+		 # also the config.xml ill be here. -> / vagrant/config.xml
+		 ls;
+		 cd PuppetEssential/scripts;
+		 ./config.xml.sh
 
 
 
@@ -348,8 +352,21 @@ function credentials(){
 }
 
 
+function keygen(){
 
+echo "Connecting to syncServer"
 
+serverIp='10.30.232.39'
+
+date
+echo 'Password is: stacksync_pass'
+
+psql -h $serverIp -d stacksync_db -U stacksync_user -t -A -F"," \
+                -c "select id, name, swift_account, swift_user, email from user1 where name ~ 'demo' " \
+				-o 'user1.csv'
+# --pset footer | -t  :: amb header o sense.
+ls -l user1.csv
+}
 
 
 
@@ -412,6 +429,10 @@ case $1 in
 		credentials
 	;;
 
+	keygen)
+		keygen
+
+	;;
 
 
 
