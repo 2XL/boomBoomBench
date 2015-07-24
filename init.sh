@@ -2,21 +2,13 @@
 
 
 echo 'Pop Up BeBe'
-
 #echo -e 'Esto es \e[0;31mrojo\e[0m y esto es \e[1;34mazul resaltado\e[0m'
-
-
-
-
-
 
 if [ $# -lt 1 ]
 then
         echo "Usage : $0 |summon|config|run|status|"
         exit
 fi
-
-
 
 function preconfig(){
 	echo 'Setup vagrant and virtualbox'
@@ -52,22 +44,9 @@ function preconfig(){
 	      git clone --recursive -b benchbox https://github.com/2XL/PuppetEssential.git;
 		  fi;
 	      echo $pass  | sudo -S PuppetEssential/scripts/installVagrantVBox.sh
-
-
 		  echo byby $host;
-
-
-
-
-
-
 		  "  & # -> install vagrant -> otherwise comment it
-
-
 	done
-
-
-
 }
 
 
@@ -160,7 +139,6 @@ function config(){
 		done
 	fi;
 
-
 	echo 'Push resource to each slave'
 	slaves=($(<data.slaves.txt))
 	profil=($(<data.slaves.profile.txt))
@@ -228,9 +206,11 @@ function run(){
 	     else
 	     echo 'Vagrant Project Not Loaded!!??'
 	     fi
+	     echo 'Launch stacksync client...'
+	     # stacksync; # aquest hauria de ser dins del puppet a cada sandBox
       echo byby $host;
 	  "  & # to run in parallel with  &
-
+		# els arranco pero parece ser que no les llega a todos...
 	done
 }
 
@@ -288,7 +268,6 @@ function scan_d1xx(){
 
 function stop_clear(){
 
-
 	slaves=($(<data.slaves.txt))
 	for i in "${!slaves[@]}";do
 	 host=${slaves[$i]}
@@ -323,15 +302,17 @@ function shutdown(){
 function credentials(){
 
 	IFS=$'\n'
-	credentials=($(<data.slaves.credential.stacksync.txt))
+	ownckey=($(<data.slaves.credential.owncloud.txt))
+	stackey=($(<data.slaves.credential.stacksync.txt))
 	slaves=($(<data.slaves.txt))
 	pass=$(more sshpwd)
 	for i in "${!slaves[@]}";do
 	 host=${slaves[$i]}
 		sshpass -p "$pass" ssh milax@$host -t -oStrictHostKeyChecking=no "
-		echo 'push credentials to home directory'
-		echo ${credentials[$i]}  > PuppetEssential/stacksync.key
-		echo 'fin copy -- credential pushed to sandBox /vagrant/stacksync.key'
+		echo 'push stackey & stackey to home directory'
+		echo ${stackey[$i]}  > PuppetEssential/stacksync.key
+		echo ${ownckey[$i]}  > PuppetEssential/owncloud.key
+		echo 'fin copy -- credential pushed to sandBox /vagrant/[stacksync.key,owncloud.key]'
 		echo 'merge credential with config.xml template'
 		echo 'TODO,'
 		# script en sandbox que configura el config.xml amb aquests credecials
@@ -341,9 +322,10 @@ function credentials(){
 		 # also the config.xml ill be here. -> / vagrant/config.xml
 		 ls;
 		 cd PuppetEssential/scripts;
-		 ./config.xml.sh
+		 ./config.xml.sh; # stacksync
+		 ./config.cfg.sh; # owncloud
 
-
+		echo 'Setup [owncloud.cfg], owncloudsync.sh with owncloud.key'
 
 	  "  # matar en paralelo...
 	done
@@ -431,10 +413,7 @@ case $1 in
 
 	keygen)
 		keygen
-
 	;;
-
-
 
 	*)
 	echo "Usage: scan|summon|config|run|status|clean|keepalive|stop_clear"
