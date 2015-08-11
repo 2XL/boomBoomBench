@@ -351,8 +351,11 @@ ls -l user1.csv
 }
 
 
+function update(){
 
+	echo 'Make the remote host pull the latest repo version'
 
+}
 
 
 
